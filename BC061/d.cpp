@@ -8,9 +8,42 @@
 
 using namespace std;
 
-void solve(int n, int m, vector< pair< int,pair<int,int> > > gr) {
-    vector<int> memo(n,0);
-    memo[0] = 1;
+const long long INF = 1LL << 50;
+
+void solve(int n, int m, vector< vector<int> > gr) {
+    vector<long long> dist(n, INF);
+    dist[0] = 0;
+    for (int loop = 0; loop < n-1; loop++) {
+        for (int i = 0; i < m; i++) {
+            if (dist[gr[i][0]-1] == INF) {
+                continue;
+            }
+            if (dist[gr[i][1]-1] > dist[gr[i][0]-1] + gr[i][2]) {
+                dist[gr[i][1]-1] = dist[gr[i][0]-1] + gr[i][2];
+            }
+        }
+    }
+    long long ans = dist[n-1];
+    vector<bool> flag(n, false);
+    for (int loop = 0; loop < n; loop++) {
+        for (int i = 0; i < m; i++) {
+            if (dist[gr[i][0]-1] == INF) {
+                continue;
+            }
+            if (dist[gr[i][1]-1] > dist[gr[i][0]-1] + gr[i][2]) {
+                dist[gr[i][1]-1] = dist[gr[i][0]-1] + gr[i][2];
+                flag[gr[i][1]-1] = true;
+            }
+            if (flag[gr[i][0]-1]) {
+                flag[gr[i][1]-1] = true;
+            }
+        }
+    }
+    if (flag[n-1]) {
+        std::cout << "inf" << std::endl;
+    } else {
+        std::cout << -ans << std::endl;
+    }
 }
 
 int main() {
@@ -21,9 +54,10 @@ int main() {
     gettimeofday(&start,NULL);
 
     std::cin >> n >> m;
-    vector< pair< int,pair<int,int> > > gr(m);
+    vector< vector<int> > gr(m, vector<int>(3));
     for (int i = 0; i < m; i++) {
-        std::cin >> gr[i].first >> gr[i].second.first >> gr[i].second.second;
+        std::cin >> gr[i][0] >> gr[i][1] >> gr[i][2];
+        gr[i][2] = -gr[i][2];
     }
     solve(n,m,gr);
 
